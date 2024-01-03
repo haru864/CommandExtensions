@@ -1,0 +1,23 @@
+# 機能
+Open Library に接続し、レスポンスをデータベースにキャッシュする。
+書籍名またはISBNで検索できるようにする。
+
+# コマンド
+book-search --[title|isbn] <string>
+
+# データベース
+CREATE TABLE open_library_cache (
+    type VARCHAR(10),
+    name VARCHAR(50),
+    created_at DATE,
+    updated_at DATE,
+    data JSON,
+    PRIMARY KEY (type, name)
+);
+
+ALTER TABLE open_library_cache 
+MODIFY COLUMN data JSON;
+
+ALTER TABLE open_library_cache 
+CHANGE update_at updated_at DATE;
+
