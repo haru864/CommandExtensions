@@ -9,7 +9,6 @@ abstract class AbstractCommand implements Command
     protected ?string $value;
     protected array $argsMap = [];
     protected static ?string $alias = null;
-
     protected static bool $requiredCommandValue = false;
 
     /**
@@ -25,11 +24,11 @@ abstract class AbstractCommand implements Command
      * このargsMapは getArgumentValue()のために使用されます。
      * すべての引数は短縮バージョンでは'-'で、完全なバージョンでは'--'で始まります。
      */
-
     private function setUpArgsMap(): void
     {
         //オリジナルのマッピングを設定
         $args = $GLOBALS['argv'];
+
         // エイリアスのインデックスが見つかるまで探索
         $startIndex  = array_search($this->getAlias(), $args);
 
@@ -77,6 +76,8 @@ abstract class AbstractCommand implements Command
             } else $this->argsMap[$argString] = $value;
         }
 
+        // var_dump($args);
+        // var_dump($shellArgs);
         $this->log(json_encode($this->argsMap));
     }
 

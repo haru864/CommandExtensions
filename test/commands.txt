@@ -1,0 +1,6 @@
+php console.php db-wipe -d practice_db -u test_user -p pass --backup
+php console.php db-wipe -database practice_db -user test_user -password pass --backup
+
+
+
+
