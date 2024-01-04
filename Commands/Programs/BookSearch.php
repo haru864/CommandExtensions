@@ -38,7 +38,7 @@ class BookSearch extends AbstractCommand
         if ($this->isUpToDate($title, $isbn)) {
             $bookData  = null;
             $bookData = $this->getLatestData($title, $isbn);
-            var_dump($bookData);
+            $this->log($bookData);
             return 0;
         }
 
@@ -58,9 +58,18 @@ class BookSearch extends AbstractCommand
             return 0;
         }
         curl_close($ch);
+
         $data = json_decode($response, true);
-        // var_dump(($data));
+        if ($data["numFound"] == 0) {
+            $this->log("No corresponding book");
+            return 0;
+        }
+        // var_dump(($response));
         // echo $data["numFound"] . PHP_EOL;
+
+        $this->updateCachedData($title, $isbn, $url);
+        echo $url;
+        // var_dump(($data));
 
         return 0;
     }
@@ -82,7 +91,7 @@ class BookSearch extends AbstractCommand
         return $updatedDate > $date30DaysAgo;
     }
 
-    private function getLatestData(?string $title = null, ?string $isbn = null): mixed
+    private function getLatestData(?string $title = null, ?string $isbn = null): string
     {
         $mysqlWrapper = new MySQLWrapper();
         $data = null;
@@ -91,11 +100,17 @@ class BookSearch extends AbstractCommand
         } else if (isset($isbn) && $isbn != "") {
             $data = $mysqlWrapper->getBookData(isbn: $isbn);
         }
-        return json_decode($data);
+        return $data;
     }
 
-    private function updateCachedData(?string $title = null, ?string $isbn = null): void
+    private function updateCachedData(?string $title = null, ?string $isbn = null, string $data): void
     {
+        $mysqlWrapper = new MySQLWrapper();
+        if ($mysqlWrapper->isRegistered($title, $isbn)) {
+            $mysqlWrapper->updateData($title, $isbn, $data);
+        } else {
+            $mysqlWrapper->insertData($title, $isbn, $data);
+        }
         return;
     }
 

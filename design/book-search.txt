@@ -11,12 +11,12 @@ CREATE TABLE open_library_cache (
     name VARCHAR(50),
     created_at DATE,
     updated_at DATE,
-    data JSON,
+    data TEXT,
     PRIMARY KEY (type, name)
 );
 
 ALTER TABLE open_library_cache 
-MODIFY COLUMN data JSON;
+MODIFY COLUMN data TEXT;
 
 ALTER TABLE open_library_cache 
 CHANGE update_at updated_at DATE;
