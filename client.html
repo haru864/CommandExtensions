@@ -2,41 +2,46 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         crossorigin="anonymous">
-
     <title>My Computer Parts Store</title>
 </head>
 
 <body>
-
     <main class="container mt-5 mb-5">
-        <!-- 内容はここに挿入されます。 -->
-        <div id="content"></div>
+        <div>
+            <button id="random_parts_btn">random parts</button>
+            <div id="random_parts_content"></div>
+        </div>
+        <div>
+            <button id="parts_by_id_btn">parts by id</button>
+            <div id="parts_by_id_content"></div>
+        </div>
+        <div>
+            <button id="parts_by_type_btn">parts by type</button>
+            <label for="parts_type">type:</label>
+            <input type="text" id="parts_type" name="parts_type">
+            <label for="page_number">ページ数:</label>
+            <input type="text" id="page_number" name="page_number">
+            <label for="item_number_per_page">1ページあたりのアイテム数:</label>
+            <input type="text" id="item_number_per_page" name="item_number_per_page">
+            <div id="parts_by_type_content"></div>
+        </div>
     </main>
-
     <footer class="bg-light text-center text-lg-start">
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2023:
-            <a class="text-dark" href="/">MyComputerPartsStore.com</a>
+            © 2023: <a class="text-dark" href="">MyComputerPartsStore.com</a>
         </div>
     </footer>
-
     <script>
-        // この関数は、ページがロードされると実行されます。
-        document.addEventListener('DOMContentLoaded', function () {
-            // APIエンドポイントにGETリクエストを送信します。
-            fetch('http://127.0.0.1:8000/api/parts?id=1')
-                .then(response => response.json())
-                .then(data => {
-                    const part = data.part;
-                    // カードHTMLを作成します。
-                    const html = `
+        async function displaySinglePart(url, element_id) {
+            try {
+                let response = await fetch(url);
+                let data = await response.json();
+                let part = data.part;
+                const html = `
                     <div class="card" style="width: 18rem;">
                         <div class="card-body">
                             <h5 class="card-title">${part.name}</h5>
@@ -55,13 +60,36 @@
                             <p class="card-text"><small class="text-muted">Last updated on ${part.updated_at}</small></p>
                         </div>
                     </div>`;
-
-                    // カードHTMLをページに挿入します
-                    document.getElementById('content').innerHTML = html;
+                document.getElementById(element_id).innerHTML = html;
+            } catch (error) {
+                console.error('There was an error fetching the data:', error);
+                document.getElementById(element_id).innerHTML = '<div class="alert alert-danger">An error occurred while fetching data.</div>';
+            }
+        }
+        document.getElementById('random_parts_btn').addEventListener('click', async function () {
+            await displaySinglePart('http://localhost:8000/api/random/part', 'random_parts_content');
+        });
+        document.getElementById('parts_by_id_btn').addEventListener('click', async function () {
+            let partsID = window.prompt("parts id:");
+            if (partsID === null) {
+                return;
+            }
+            await displaySinglePart(`http://localhost:8000/api/parts?id=${partsID}`, 'parts_by_id_content');
+        });
+        document.getElementById('parts_by_type_btn').addEventListener('click', function () {
+            let type = document.getElementById('parts_type').value;
+            let page = document.getElementById('page_number').value;
+            let perpage = document.getElementById('item_number_per_page').value;
+            fetch(`http://localhost:8000/api/types?type=${type}&page=${page}&perpage=${perpage}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const parts = data.part;
+                    document.getElementById('parts_by_type_content').innerHTML = parts;
                 })
                 .catch(error => {
                     console.error('There was an error fetching the data:', error);
-                    document.getElementById('content').innerHTML = '<div class="alert alert-danger">An error occurred while fetching data.</div>';
+                    document.getElementById('parts_by_type_content').innerHTML = '<div class="alert alert-danger">An error occurred while fetching data.</div>';
                 });
         });
     </script>

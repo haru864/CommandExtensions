@@ -25,4 +25,11 @@ return [
         $part = DatabaseHelper::getComputerPartById($id);
         return new JSONRenderer(['part' => $part]);
     },
+    'api/types' => function () {
+        $type = ValidationHelper::string($_GET['type'] ?? null);
+        $page = ValidationHelper::integer($_GET['page'] ?? null);
+        $perpage = ValidationHelper::integer($_GET['perpage'] ?? null);
+        $part = DatabaseHelper::getComputerPartByType($type);
+        return new JSONRenderer(['parts' => $part]);
+    },
 ];
