@@ -30,6 +30,7 @@ if (isset($routes[$path])) {
 
             if ($sanitized_value && $sanitized_value === $value) {
                 header("{$name}: {$sanitized_value}");
+                header("Access-Control-Allow-Origin: *");
             } else {
                 // ヘッダー設定に失敗した場合、ログに記録するか処理します。
                 // エラー処理によっては、例外をスローするか、デフォルトのまま続行することもできます。
