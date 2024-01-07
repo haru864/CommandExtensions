@@ -83,9 +83,10 @@
             fetch(`http://localhost:8000/api/types?type=${type}&page=${page}&perpage=${perpage}`)
                 .then(response => response.json())
                 .then(data => {
+                    const parts = data.parts;
                     console.log(data);
-                    const parts = data.part;
-                    document.getElementById('parts_by_type_content').innerHTML = parts;
+                    console.log(data.parts);
+                    document.getElementById('parts_by_type_content').innerHTML = JSON.stringify(parts,null,'<br>');
                 })
                 .catch(error => {
                     console.error('There was an error fetching the data:', error);
